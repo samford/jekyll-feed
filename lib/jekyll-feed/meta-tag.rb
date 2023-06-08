@@ -12,6 +12,7 @@ module JekyllFeed
       config = context.registers[:site].config
       path   = config.dig("feed", "path") || "feed.xml"
       title  = config["title"] || config["name"]
+      close_tag = config["self_closing_tags"] == false ? "" : " /"
 
       attributes = {
         :type => "application/atom+xml",
@@ -21,7 +22,7 @@ module JekyllFeed
       attributes[:title] = title if title
 
       attrs = attributes.map { |k, v| "#{k}=#{v.to_s.encode(:xml => :attr)}" }.join(" ")
-      "<link #{attrs} />"
+      "<link #{attrs}#{close_tag}>"
     end
   end
 end

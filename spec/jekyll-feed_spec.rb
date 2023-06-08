@@ -4,8 +4,8 @@ require "spec_helper"
 
 describe(JekyllFeed) do
   let(:overrides) { {} }
-  let(:config) do
-    Jekyll.configuration(Jekyll::Utils.deep_merge_hashes({
+  let(:config_hash) do
+    {
       "full_rebuild" => true,
       "source"       => source_dir,
       "destination"  => dest_dir,
@@ -19,8 +19,9 @@ describe(JekyllFeed) do
         "my_collection" => { "output" => true },
         "other_things"  => { "output" => false },
       },
-    }, overrides))
+    }
   end
+  let(:config) { Jekyll.configuration(Jekyll::Utils.deep_merge_hashes(config_hash, overrides)) }
   let(:site)     { Jekyll::Site.new(config) }
   let(:contents) { File.read(dest_dir("feed.xml")) }
   let(:context)  { make_context(:site => site) }
@@ -315,6 +316,32 @@ describe(JekyllFeed) do
 
       it "does not output blank title" do
         expect(feed_meta).not_to include("title=")
+      end
+    end
+
+    context "with site.self_closing_tags set to false" do
+      let(:feed_meta_self_closing_false) do
+        config_self_closing_false = Jekyll.configuration(Jekyll::Utils.deep_merge_hashes(config_hash, { "self_closing_tags" => false }))
+        context_self_closing_false = make_context(:site => Jekyll::Site.new(config_self_closing_false))
+
+        Liquid::Template.parse("{% feed_meta %}").render!(context_self_closing_false, {})
+      end
+
+      it "omits trailing forward slash in void elements" do
+        expect(feed_meta_self_closing_false).not_to include("/>")
+      end
+    end
+
+    context "with site.self_closing_tags set to true" do
+      let(:feed_meta_self_closing_true) do
+        config_self_closing_true = Jekyll.configuration(Jekyll::Utils.deep_merge_hashes(config_hash, { "self_closing_tags" => true }))
+        context_self_closing_true = make_context(:site => Jekyll::Site.new(config_self_closing_true))
+
+        Liquid::Template.parse("{% feed_meta %}").render!(context_self_closing_true, {})
+      end
+
+      it "includes trailing forward slash in void elements" do
+        expect(feed_meta_self_closing_true).to include("/>")
       end
     end
   end

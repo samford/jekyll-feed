@@ -33,6 +33,7 @@ The plugin will automatically use any of the following configuration variables, 
 * `description` - A longer description of what your site is about, e.g., "Where I blog about Jekyll and other awesome things"
 * `url` - The URL to your site, e.g., `https://example.com`. If none is provided, the plugin will try to use `site.github.url`.
 * `author` - Global author information (see below)
+* `self_closing_tags` - A boolean indicating whether to self-close void HTML elements (e.g., `link`). This will be treated as `true` by default.
 
 ### Already have a feed path?
 
